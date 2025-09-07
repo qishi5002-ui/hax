@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Game Keys Store - Delta & PUBG</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#071428;
+    --card:#0d2740;
+    --accent:#176fb3;
+    --accent2:#2bb3ff;
+    --muted:#9aa6b2;
+    --white:#eef2f6;
+    --danger:#ff6b6b;
+    --success:#2dd4bf;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{background:linear-gradient(180deg,#04142a 0%, #061a30 60%); color:var(--white); -webkit-font-smoothing:antialiased;}
+  .container{max-width:1100px;margin:20px auto;padding:18px;}
+  header{display:flex;align-items:center;gap:12px;}
+  .hamburger{cursor:pointer;padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);}
+  .brand{font-weight:800;font-size:20px;letter-spacing:0.2px}
+  .top-links{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .btn{background:var(--accent);padding:8px 12px;border-radius:8px;color:white;text-decoration:none;display:inline-block}
+  .note-box{background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.03);padding:12px;border-radius:10px;margin:14px 0; color:var(--white)}
+  .note-box strong{display:block;margin-bottom:6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.03)}
+  .card .title{font-weight:700;margin:8px 0;color:#fff}
+  .price{font-weight:700;color:var(--accent2);font-size:18px}
+  .meta{color:var(--muted);font-size:13px}
+  .small-badge{display:inline-block;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:8px;color:var(--muted);font-size:13px}
+  footer{margin-top:22px;color:var(--muted);font-size:13px}
+  /* product detail modal / page */
+  .panel{background:linear-gradient(180deg,#062237 0%, #082a3b 100%);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);margin-top:12px}
+  .option{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;margin:6px 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+  .option.selected{outline:2px solid rgba(43,180,230,0.12);box-shadow:0 6px 20px rgba(11,60,90,0.5)}
+  input[type="text"], input[type="email"]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:var(--white);margin-top:8px}
+  .copy-box{display:flex;gap:8px;align-items:center}
+  .copy-input{flex:1;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);color:var(--white)}
+  .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:var(--white)}
+  .receipt{background:linear-gradient(180deg,#052033,#06263b);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+  .center{text-align:center}
+  /* recent purchase popup */
+  .recent-popup{position:fixed;left:20px;bottom:80px;background:rgba(255,255,255,0.96);color:#062033;padding:10px 14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.4);display:none;z-index:40}
+  .recent-popup strong{display:block}
+  /* admin */
+  .admin-panel{background:linear-gradient(180deg,#041827 0%, #061a2a 100%);padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03);font-size:13px}
+  .status-pill{padding:6px 8px;border-radius:8px;font-weight:600;font-size:12px}
+  .status-pending{background:rgba(255,200,0,0.12);color:#ffd166}
+  .status-delivered{background:rgba(30,200,100,0.08);color:var(--success)}
+  .status-cancel{background:rgba(255,90,90,0.06);color:var(--danger)}
+  .topbar{display:flex;gap:12px;align-items:center}
+  /* small screens */
+  @media(max-width:600px){
+    .container{padding:10px}
+    header .brand{font-size:18px}
+    .recent-popup{left:12px;right:12px}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="hamburger" id="hambBtn">☰</div>
+    <div class="brand">GameKeys Store</div>
+    <div class="top-links" id="topLinks">
+      <a class="small-badge" href="#" data-nav="home">Home</a>
+      <a class="small-badge" href="#" data-nav="track">Track Order</a>
+      <a class="small-badge" href="#" id="adminBtn">Admin Login</a>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- Homepage -->
+    <section id="homeView">
+      <div class="note-box" role="note">
+        <strong>NOTE:</strong>
+        Please <strong>SCREENSHOT</strong> your crypto payments and receipt. Keep both screenshots safe — you will be asked to send BOTH screenshots to the admin via Telegram after payment.
+      </div>
+
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:800;font-size:18px">Featured Keys</div>
+            <div class="meta">Prices shown in <strong>USDT</strong>. Network: TRC-20</div>
+          </div>
+          <div class="meta">Crypto Wallet: <code id="walletShort">TEwKbkN...7pqc</code></div>
+        </div>
+
+        <div class="grid" id="productsGrid">
+          <!-- product cards inserted by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Product / Checkout view -->
+    <section id="productView" style="display:none">
+      <a href="#" id="backHome" class="meta">← Back to home</a>
+      <div id="productDetail" class="panel" style="margin-top:10px">
+        <!-- details inserted by JS -->
+      </div>
+    </section>
+
+    <!-- Receipt view -->
+    <section id="receiptView" style="display:none">
+      <a href="#" id="toHomeFromReceipt" class="meta">← Back to home</a>
+      <div class="receipt" id="receiptArea">
+        <!-- receipt injected -->
+      </div>
+    </section>
+
+    <!-- Track Order -->
+    <section id="trackView" style="display:none">
+      <a href="#" id="backHome2" class="meta">← Back to home</a>
+      <div class="panel" style="margin-top:12px">
+        <div style="font-weight:700">Track Order</div>
+        <div class="meta">Enter your order id to check status:</div>
+        <input id="trackInput" type="text" placeholder="ORDER-XXXXXXXX" />
+        <div style="margin-top:10px"><button class="btn" id="trackBtn">Check</button></div>
+        <div id="trackResult" style="margin-top:12px"></div>
+      </div>
+    </section>
+
+    <!-- Admin -->
+    <section id="adminView" style="display:none">
+      <a href="#" id="backHome3" class="meta">← Back to home</a>
+      <div class="admin-panel" style="margin-top:12px">
+        <div class="topbar">
+          <div style="font-weight:800;font-size:18px">Admin Dashboard</div>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+            <div class="meta">Orders total: <span id="adminTotalOrders">0</span></div>
+            <div class="meta">Pending: <span id="adminPending">0</span></div>
+            <div class="meta">Delivered: <span id="adminDelivered">0</span></div>
+            <div class="meta">Cancelled: <span id="adminCancelled">0</span></div>
+            <div class="meta">Total Profits (USDT): <strong id="adminProfits">0</strong></div>
+            <button class="ghost" id="adminLogout">Logout</button>
+          </div>
+        </div>
+
+        <div id="ordersTableWrap" style="margin-top:12px">
+          <table id="ordersTable">
+            <thead>
+              <tr><th>Order ID</th><th>User (tg)</th><th>Product</th><th>Duration</th><th>Price</th><th>Profit</th><th>Status</th><th>Time</th><th>Actions</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer class="center">
+      <div class="meta">This is a demo static store UI (client-only). Do not use as a real payment processor — verify payments manually.</div>
+    </footer>
+  </main>
+</div>
+
+<!-- recent purchase popup -->
+<div class="recent-popup" id="recentPopup">
+  <div style="font-size:13px;color:#0a2540">Recent purchase</div>
+  <strong id="recentText"></strong>
+  <div class="meta" id="recentAgo"></div>
+</div>
+
+<script>
+/* ====== Data Setup ====== */
+const WALLET_ADDRESS = "TEwKbkNdXqvNUG951nYTCRF6UjLGBn7pqc";
+const WALLET_NETWORK = "TRC-20";
+
+/* Products + price list (USDT) */
+const PRODUCTS = {
+  "delta": {
+    id:"delta",
+    name:"Delta Force Key",
+    prices: {"1":"5","3":"8","7":"12","14":"17","30":"23"}, // display prices in USDT
+    profits: {"1":"2","3":"3","7":"3","14":"4","30":"5"}
+  },
+  "pubg": {
+    id:"pubg",
+    name:"PubG Key",
+    prices: {"1":"4","3":"7","7":"11","30":"22"},
+    profits: {"1":"2","3":"3","7":"4","30":"7"}
+  }
+};
+
+/* localStorage keys */
+const ORDERS_KEY = "game_keys_store_orders_v1";
+
+/* helpers */
+function qs(sel,root=document) { return root.querySelector(sel); }
+function qsa(sel,root=document){ return Array.from(root.querySelectorAll(sel)); }
+function formatDate(d=new Date()){
+  const z = n=> n.toString().padStart(2,"0");
+  return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`;
+}
+function randomId(){
+  const r = Math.random().toString(36).slice(2,10).toUpperCase();
+  return `ORDER-${r}`;
+}
+function saveOrders(orders){ localStorage.setItem(ORDERS_KEY, JSON.stringify(orders||[])); }
+function loadOrders(){ try{ return JSON.parse(localStorage.getItem(ORDERS_KEY)||"[]"); }catch(e){ return []; } }
+function calcProfit(productId,dur){
+  const p = PRODUCTS[productId].profits[dur];
+  return p ? parseFloat(p) : 0;
+}
+
+/* ====== Build homepage product grid ====== */
+function renderProducts(){
+  const grid = qs("#productsGrid");
+  grid.innerHTML="";
+  Object.values(PRODUCTS).forEach(prod=>{
+    const el = document.createElement("div");
+    el.className="card";
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:64px;height:64px;background:linear-gradient(135deg, #0b3a5b, #194a73);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff">GK</div>
+        <div style="flex:1">
+          <div class="title">${prod.name}</div>
+          <div class="meta">From <strong class="price">${Object.values(prod.prices)[0]} USDT</strong></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center">
+        <div class="meta">Available durations: ${Object.keys(prod.prices).join(", ")} days</div>
+        <div>
+          <button class="btn viewProduct" data-prod="${prod.id}">Buy</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(el);
+  });
+  qsa(".viewProduct").forEach(b=>b.addEventListener("click", e=>{
+    const pid = e.currentTarget.dataset.prod;
+    openProduct(pid);
+  }));
+}
+
+/* ====== Product view & checkout ====== */
+function openProduct(productId){
+  const prod = PRODUCTS[productId];
+  qs("#homeView").style.display = "none";
+  qs("#productView").style.display = "block";
+  qs("#receiptView").style.display = "none";
+  qs("#trackView").style.display = "none";
+  qs("#adminView").style.display = "none";
+
+  const wrap = qs("#productDetail");
+  wrap.innerHTML = `
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="width:88px;height:88px;border-radius:12px;background:linear-gradient(135deg,#083a57,#0f5e86);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff">GK</div>
+      <div>
+        <div style="font-weight:800;font-size:18px">${prod.name}</div>
+        <div class="meta">Network: ${WALLET_NETWORK} — Pay in USDT</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div style="font-weight:700">Choose duration</div>
+      <div id="durationOptions" style="margin-top:8px"></div>
+
+      <div style="margin-top:12px">
+        <label style="font-weight:700">Telegram username *</label>
+        <input type="text" id="tgUsername" placeholder="@yourusername" />
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700">Payment (copy wallet)</div>
+          <div class="meta">Network: ${WALLET_NETWORK}</div>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+          <input id="walletAddress" class="copy-input" readonly value="${WALLET_ADDRESS}" />
+          <button class="btn" id="copyWalletBtn">Copy</button>
+        </div>
+        <div class="meta" style="margin-top:8px">Price: <span id="selectedPrice" style="font-weight:800"></span> USDT</div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn" id="checkoutBtn">Checkout</button>
+        <button class="ghost" id="cancelCheckout">Cancel</button>
+      </div>
+    </div>
+  `;
+
+  // render duration options
+  const durationWrap = qs("#durationOptions");
+  durationWrap.innerHTML = "";
+  Object.entries(prod.prices).forEach(([dur,price],i)=>{
+    const op = document.createElement("div");
+    op.className="option" + (i===0 ? " selected":"");
+    op.dataset.dur = dur;
+    op.dataset.price = price;
+    op.innerHTML = `<div style="font-weight:700">${dur} day${dur>1?"s":""}</div><div style="font-weight:800">${price} USDT</div>`;
+    durationWrap.appendChild(op);
+  });
+
+  function updateSelected(){
+    const sel = durationWrap.querySelector(".option.selected") || durationWrap.firstChild;
+    const price = sel.dataset.price;
+    qs("#selectedPrice").textContent = price;
+  }
+  updateSelected();
+
+  qsa("#durationOptions .option").forEach(o=>{
+    o.addEventListener("click", ()=>{
+      qsa("#durationOptions .option").forEach(x=>x.classList.remove("selected"));
+      o.classList.add("selected");
+      updateSelected();
+    });
+  });
+
+  qs("#copyWalletBtn").addEventListener("click", ()=>{
+    navigator.clipboard.writeText(WALLET_ADDRESS).then(()=>{
+      qs("#copyWalletBtn").textContent = "Copied!";
+      setTimeout(()=> qs("#copyWalletBtn").textContent = "Copy",1200);
+    }).catch(()=> alert("Could not copy. Please copy manually: " + WALLET_ADDRESS));
+  });
+
+  qs("#cancelCheckout").addEventListener("click", ()=>{
+    qs("#homeView").style.display = "";
+    qs("#productView").style.display = "none";
+  });
+
+  qs("#checkoutBtn").addEventListener("click", ()=>{
+    const username = qs("#tgUsername").value.trim();
+    if(!username) { alert("Please enter your Telegram username (e.g. @yourname)"); return; }
+    const sel = durationWrap.querySelector(".option.selected");
+    const duration = sel.dataset.dur;
+    const price = parseFloat(sel.dataset.price);
+
+    // create pending order and show pay instructions
+    const order = {
+      id: randomId(),
+      product: prod.id,
+      productName: prod.name,
+      duration: duration,
+      price: price,
+      profit: calcProfit(prod.id,duration),
+      username: username,
+      status: "Pending",
+      createdAt: new Date().toISOString()
+    };
+
+    // store order temporarily in localStorage as pending (so receipt can be shown)
+    const orders = loadOrders();
+    orders.unshift(order);
+    saveOrders(orders);
+
+    // show the payment/receipt page - but instruct the user to pay then click "I've paid"
+    showReceipt(order, true);
+  });
+
+}
+
+/* ====== Receipt view (after checkout) ====== */
+function showReceipt(order, fromCheckout=false){
+  qs("#homeView").style.display = "none";
+  qs("#productView").style.display = "none";
+  qs("#trackView").style.display = "none";
+  qs("#adminView").style.display = "none";
+  qs("#receiptView").style.display = "block";
+
+  const receipt = qs("#receiptArea");
+  receipt.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-weight:800;font-size:18px">Receipt</div>
+        <div class="meta">Order ID: <strong>${order.id}</strong></div>
+      </div>
+      <div class="meta">${formatDate(new Date(order.createdAt))}</div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
+
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="width:72px;height:72px;border-radius:10px;background:linear-gradient(135deg,#0b3a5b,#194a73);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff">${order.productName.split(" ")[0].slice(0,2)}</div>
+      <div style="flex:1">
+        <div style="font-weight:800">${order.productName}</div>
+        <div class="meta">Duration: ${order.duration} day(s)</div>
+        <div style="margin-top:6px">Price: <strong style="color:var(--accent2)">${order.price} USDT</strong></div>
+        <div class="meta" style="margin-top:6px">Status: <span class="status-pill status-pending">Pending</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div style="font-weight:700">Payment instructions</div>
+      <div class="meta">Send <strong>${order.price} USDT</strong> (TRC-20) to the wallet below. Then, take screenshots of both the crypto payment and this receipt, and send BOTH to Telegram: <a href="https://t.me/cocomelonqueen" target="_blank">@cocomelonqueen</a></div>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <input class="copy-input" id="receiptWallet" readonly value="${WALLET_ADDRESS}" />
+        <button class="btn" id="receiptCopy">Copy</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn" id="paidBtn">I've paid</button>
+      <button class="ghost" id="cancelReceipt">Cancel</button>
+    </div>
+
+    <div style="margin-top:12px" class="meta">Order will remain <strong>Pending</strong> until admin verifies payment.</div>
+  `;
+
+  qs("#receiptCopy").addEventListener("click", ()=> {
+    navigator.clipboard.writeText(WALLET_ADDRESS).then(()=> {
+      qs("#receiptCopy").textContent = "Copied!";
+      setTimeout(()=> qs("#receiptCopy").textContent = "Copy",1200);
+    }).catch(()=> alert("Copy failed"));
+  });
+
+  qs("#cancelReceipt").addEventListener("click", ()=>{
+    qs("#receiptView").style.display = "none";
+    qs("#homeView").style.display = "";
+  });
+
+  qs("#paidBtn").addEventListener("click", ()=>{
+    // When user clicks I've paid: mark order as Pending (already pending), open a final "paid" confirmation page that they should screenshot.
+    // We'll update its record with a "paidClickedAt" timestamp so admin can see.
+    const orders = loadOrders();
+    const idx = orders.findIndex(o=>o.id === order.id);
+    if(idx !== -1){
+      orders[idx].paidClickedAt = new Date().toISOString();
+      saveOrders(orders);
+    }
+    // show a final page indicating "awaiting verification"
+    alert("Thank you — you clicked 'I've paid'. Please screenshot this page and the crypto payment, then send BOTH to @cocomelonqueen on Telegram.");
+  });
+
+  // update admin stats
+  refreshAdmin();
+}
+
+/* ====== Track order view ====== */
+qs("#trackBtn").addEventListener("click", ()=>{
+  const id = qs("#trackInput").value.trim().toUpperCase();
+  if(!id) return alert("Please enter order id");
+  const orders = loadOrders();
+  const ord = orders.find(o=>o.id.toUpperCase() === id);
+  const wrap = qs("#trackResult");
+  if(!ord) {
+    wrap.innerHTML = `<div class="meta">Order not found.</div>`;
+  } else {
+    wrap.innerHTML = `
+      <div class="panel">
+        <div style="font-weight:800">${ord.productName}</div>
+        <div class="meta">Order ID: ${ord.id}</div>
+        <div class="meta">User (tg): ${escapeHtml(ord.username)}</div>
+        <div class="meta">Price: ${ord.price} USDT</div>
+        <div class="meta">Status: <strong>${ord.status}</strong></div>
+        <div class="meta">Created at: ${formatDate(new Date(ord.createdAt))}</div>
+      </div>
+    `;
+  }
+});
+
+/* ====== Admin login & panel ====== */
+const ADMIN_PASSWORD = "admin123"; // simple demo password
+qs("#adminBtn").addEventListener("click", ()=> attemptAdmin());
+qs("#adminLogout").addEventListener("click", ()=> {
+  localStorage.removeItem("admin_logged");
+  alert("Logged out");
+  showView("home");
+});
+
+function attemptAdmin(){
+  const logged = localStorage.getItem("admin_logged");
+  if(logged === "1") { showAdmin(); return; }
+  const pw = prompt("Admin password:");
+  if(pw === ADMIN_PASSWORD){
+    localStorage.setItem("admin_logged","1");
+    showAdmin();
+  } else {
+    alert("Wrong password");
+  }
+}
+
+function showAdmin(){
+  // show admin view
+  showView("admin");
+  refreshAdmin();
+}
+
+/* ====== Admin refresh & table ====== */
+function refreshAdmin(){
+  const orders = loadOrders();
+  qs("#adminTotalOrders").textContent = orders.length;
+  qs("#adminPending").textContent = orders.filter(o=>o.status==="Pending").length;
+  qs("#adminDelivered").textContent = orders.filter(o=>o.status==="Delivered").length;
+  qs("#adminCancelled").textContent = orders.filter(o=>o.status==="Cancelled").length;
+  // total profits sum
+  const totalProfit = orders.reduce((sum,o)=> sum + (parseFloat(o.profit||0)),0);
+  qs("#adminProfits").textContent = totalProfit.toFixed(2);
+
+  // fill table
+  const tbody = qs("#ordersTable tbody");
+  tbody.innerHTML = "";
+  orders.forEach(o=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${o.id}</td>
+      <td>${escapeHtml(o.username)}</td>
+      <td>${escapeHtml(o.productName)}</td>
+      <td>${o.duration} day(s)</td>
+      <td>${o.price} USDT</td>
+      <td>${o.profit} USDT</td>
+      <td><span class="status-pill ${o.status==="Pending"?"status-pending": o.status==="Delivered"?"status-delivered":"status-cancel"}">${o.status}</span></td>
+      <td>${formatDate(new Date(o.createdAt))}</td>
+      <td>
+        <button class="ghost admin-set" data-id="${o.id}" data-status="Delivered">Deliver</button>
+        <button class="ghost admin-set" data-id="${o.id}" data-status="Cancelled">Cancel</button>
+        <button class="ghost admin-del" data-id="${o.id}">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  qsa(".admin-set").forEach(b=>{
+    b.addEventListener("click",(e)=>{
+      const id = e.currentTarget.dataset.id;
+      const newStatus = e.currentTarget.dataset.status;
+      const orders = loadOrders();
+      const idx = orders.findIndex(x=>x.id===id);
+      if(idx===-1) return;
+      orders[idx].status = newStatus;
+      saveOrders(orders);
+      refreshAdmin();
+    });
+  });
+
+  qsa(".admin-del").forEach(b=>{
+    b.addEventListener("click",(e)=>{
+      const id = e.currentTarget.dataset.id;
+      if(!confirm("Delete this order?")) return;
+      let orders = loadOrders();
+      orders = orders.filter(x=>x.id!==id);
+      saveOrders(orders);
+      refreshAdmin();
+    });
+  });
+}
+
+/* ====== Navigation helpers ====== */
+function showView(v){
+  qs("#homeView").style.display = (v==="home" ? "" : "none");
+  qs("#productView").style.display = (v==="product" ? "" : "none");
+  qs("#receiptView").style.display = (v==="receipt" ? "" : "none");
+  qs("#trackView").style.display = (v==="track" ? "" : "none");
+  qs("#adminView").style.display = (v==="admin" ? "" : "none");
+}
+
+qs("#topLinks").addEventListener("click",(e)=>{
+  if(e.target.dataset && e.target.dataset.nav){
+    const nav = e.target.dataset.nav;
+    if(nav==="home") showView("home");
+    if(nav==="track") { showView("track"); }
+  }
+});
+
+qs("#backHome").addEventListener("click",(e)=>{ e.preventDefault(); showView("home"); });
+qs("#toHomeFromReceipt").addEventListener("click",(e)=>{ e.preventDefault(); showView("home"); });
+qs("#backHome2").addEventListener("click",(e)=>{ e.preventDefault(); showView("home"); });
+qs("#backHome3").addEventListener("click",(e)=>{ e.preventDefault(); showView("home"); });
+
+/* hamburger small */
+qs("#hambBtn").addEventListener("click", ()=>{
+  // simple mobile toggle opens a prompt-style menu
+  const menu = `Menu:
+1) Home
+2) Track Order
+3) Admin
+Enter 1/2/3`;
+  const choice = prompt(menu);
+  if(choice==="1") showView("home");
+  if(choice==="2") showView("track");
+  if(choice==="3") attemptAdmin();
+});
+
+/* ====== Recent purchases popup (fake) ====== */
+const RECENT_PRODUCTS = [
+  {pid:"delta", nameshort:"Delta"},
+  {pid:"pubg", nameshort:"PubG"},
+];
+function randomRecent(){
+  // random username partly censored (e.g. John****)
+  const names = ["maximillian","alexander","sarah","johnny","gamer123","pro_player","shadowz","moonlight","xkiller"];
+  const nm = names[Math.floor(Math.random()*names.length)];
+  const censored = nm[0] + nm[1] + nm.slice(2).replace(/./g,"*");
+  const prod = RECENT_PRODUCTS[Math.floor(Math.random()*RECENT_PRODUCTS.length)];
+  return {user:censored, product:prod.nameshort, ago: Math.floor(Math.random()*58)+1 + " min ago"};
+}
+let recentTimer = null;
+function showRecentOnce(){
+  const r = randomRecent();
+  qs("#recentText").textContent = `${r.user} bought ${r.product} key`;
+  qs("#recentAgo").textContent = r.ago;
+  const popup = qs("#recentPopup");
+  popup.style.display = "block";
+  // hide after 6 seconds
+  setTimeout(()=> popup.style.display = "none", 6000);
+  // schedule next between 5-10 sec
+  const next = 5000 + Math.random()*5000;
+  recentTimer = setTimeout(showRecentOnce, next);
+}
+
+/* ====== Utilities ====== */
+function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+
+/* ====== Boot ====== */
+renderProducts();
+qs("#walletShort").textContent = WALLET_ADDRESS.slice(0,6)+"..."+WALLET_ADDRESS.slice(-4);
+
+/* Start recent popups */
+setTimeout(showRecentOnce, 3000);
+
+/* show / nav initial */
+showView("home");
+refreshAdmin();
+</script>
+</body>
+</html>
